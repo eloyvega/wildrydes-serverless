@@ -185,8 +185,7 @@ resources:
       Value:
         Ref: CognitoUserPool
     UserPoolArn:
-      Value:
-        GetAtt: CognitoUserPool.Arn
+      Value: !GetAtt CognitoUserPool.Arn
     UserPoolClientId:
       Value:
         Ref: CognitoUserPoolClient
@@ -295,8 +294,7 @@ resources:
       Value:
         Ref: CognitoUserPool
     UserPoolArn:
-      Value:
-        GetAtt: CognitoUserPool.Arn
+      Value: !GetAtt CognitoUserPool.Arn
     UserPoolClientId:
       Value:
         Ref: CognitoUserPoolClient
