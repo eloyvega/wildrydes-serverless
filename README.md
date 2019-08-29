@@ -334,7 +334,13 @@ package:
 
 El código de la función se encuentra en la carpeta `lambda_function/`, Serverless se encarga de empaquetarlo y subirlo a S3 y crear la función. La instrucción `package` nos ayuda a evitar desplegar el contenido del sitio web en nuestra función Lambda.
 
-**e.** Para probar nuestra implementación:
+**e.** Desplegar nuestro servicio nuevamente:
+
+```
+serverless deploy
+```
+
+**f.** Para probar nuestra implementación:
 
 - Ir a la consola de Lambda en AWS y buscar la función `wildrydes-serverless-dev-RequestUnicorn`.
 
