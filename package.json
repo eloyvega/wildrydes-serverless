@@ -2,7 +2,9 @@
   "name": "wildrydes-serverless",
   "description": "",
   "version": "0.1.0",
-  "dependencies": {},
+  "dependencies": {
+    "aws-xray-sdk": "^2.5.0"
+  },
   "devDependencies": {
     "serverless-finch": "^2.5.2"
   }

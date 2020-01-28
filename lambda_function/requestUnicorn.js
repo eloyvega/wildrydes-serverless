@@ -1,6 +1,8 @@
 const randomBytes = require("crypto").randomBytes;
 
-const AWS = require("aws-sdk");
+const AWSXRay = require("aws-xray-sdk");
+
+const AWS = AWSXRay.captureAWS(require("aws-sdk"));
 
 const ddb = new AWS.DynamoDB.DocumentClient();
 

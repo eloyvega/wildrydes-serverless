@@ -9,6 +9,9 @@ provider:
       Action:
         - "dynamodb:PutItem"
       Resource: !GetAtt DynamoTable.Arn
+  tracing:
+    apiGateway: true
+    lambda: true
 
 plugins:
   - serverless-finch
