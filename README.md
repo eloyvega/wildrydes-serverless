@@ -117,7 +117,7 @@ Modifica el archivo `serverless.yml` con la nueva sección `custom` y los siguie
 ```yaml
 custom:
   client:
-    bucketName: wildrydes-serverless-firstname-lastname
+    bucketName: ${self:service}-${self:provider.stage}-firstname-lastname
     distributionFolder: website
 ```
 
