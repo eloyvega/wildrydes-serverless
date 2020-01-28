@@ -1,0 +1,77 @@
+service: wildrydes-serverless
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:PutItem"
+      Resource: !GetAtt DynamoTable.Arn
+
+plugins:
+  - serverless-finch
+custom:
+  client:
+    bucketName: ${self:service}-${self:provider.stage}-firstname-lastname
+    distributionFolder: website
+
+functions:
+  RequestUnicorn:
+    handler: lambda_function/requestUnicorn.handler
+    environment:
+      dynamoTableName: ${self:service}-${self:provider.stage}
+    events:
+      - http:
+          path: ride
+          method: post
+          cors: true
+          # authorizer:
+          #   arn: arn:aws:cognito-idp:us-east-1::userpool/us-east-1_xxxxxxx
+
+package:
+  exclude:
+    - website/**
+
+resources:
+  Resources:
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: ${self:service}-${self:provider.stage}
+        AutoVerifiedAttributes:
+          - email
+        Schema:
+          - Name: email
+            Mutable: false
+            Required: true
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: WildRydesWebApp
+        UserPoolId:
+          Ref: CognitoUserPool
+        GenerateSecret: false
+    DynamoTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}
+        ProvisionedThroughput:
+          ReadCapacityUnits: "5"
+          WriteCapacityUnits: "5"
+        AttributeDefinitions:
+          - AttributeName: "RideId"
+            AttributeType: "S"
+        KeySchema:
+          - AttributeName: "RideId"
+            KeyType: "HASH"
+  Outputs:
+    UserPoolId:
+      Value:
+        Ref: CognitoUserPool
+    UserPoolArn:
+      Value: !GetAtt CognitoUserPool.Arn
+    UserPoolClientId:
+      Value:
+        Ref: CognitoUserPoolClient
