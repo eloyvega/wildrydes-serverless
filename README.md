@@ -18,9 +18,7 @@ La arquitectura de la aplicación utiliza AWS Lambda, Amazon API Gateway, Amazon
 
 3. **Backend sin servidor**: Amazon DynamoDB proporciona una capa de persistencia donde los datos se pueden almacenar mediante la función Lambda de la API.
 
-
-4. **API RESTful**: El código JavaScript ejecutado en el navegador envía y recibe datos de una API de backend pública creada mediante Lambda y API Gateway.
-
+4) **API RESTful**: El código JavaScript ejecutado en el navegador envía y recibe datos de una API de backend pública creada mediante Lambda y API Gateway.
 
 ## Preparación del ambiente
 
@@ -141,7 +139,6 @@ Te pedira tu confirmación para crear el bucket, sus configuraciones y desplegar
 
 Confirma con `y` y Enter.
 
-
 **d.** Valida que tu sitio web se encuentra funcionando correctamente. Al terminar la ejecución del despliegue con `sls client deploy`, te mostrará dirección de tu sitio web de la siguiente forma (con una URL diferente):
 
 ```
@@ -215,20 +212,20 @@ UserPoolId: us-east-1_6EIjfKMgO
 ServerlessDeploymentBucketName: wildrydes-serverless-dev-serverlessdeploymentbuck-mfx9dzp7g0j8
 ```
 
-Usaremos los valores de `UserPoolId` y `UserPoolClientId` en el siguiente paso. 
+Usaremos los valores de `UserPoolId` y `UserPoolClientId` en el siguiente paso.
 
 **d.** Es necesario modificar el sitio web con los valores de nuestro Cognito User Pool para permitir el registro de nuevos usuarios. Actualiza el archivo `website/js/config.js` de la siguiente forma:
 
 ```js
 window._config = {
-    cognito: {
-        userPoolId: 'VALOR_DE_UserPoolId',
-        userPoolClientId: 'VALOR_DE_UserPoolClientId',
-        region: 'us-east-1'
-    },
-    api: {
-        invokeUrl: ''
-    }
+  cognito: {
+    userPoolId: "VALOR_DE_UserPoolId",
+    userPoolClientId: "VALOR_DE_UserPoolClientId",
+    region: "us-east-1"
+  },
+  api: {
+    invokeUrl: ""
+  }
 };
 ```
 
@@ -238,11 +235,11 @@ Una vez guardados los cambios desplegamos nuevamente el sitio web con el comando
 serverless client deploy
 ```
 
-**e.** Validamos la administración de usuarios desde nuestro sitio web. Visite `/register.html` en su dominio de sitio web o elija el botón `Giddy Up!` en la página de inicio de su sitio. 
+**e.** Validamos la administración de usuarios desde nuestro sitio web. Visite `/register.html` en su dominio de sitio web o elija el botón `Giddy Up!` en la página de inicio de su sitio.
 
 Complete el formulario de registro y elija Let's Ryde. Puede utilizar su correo electrónico o especificar uno falso. Asegúrese de elegir una contraseña que contenga al menos una letra en mayúsculas, un número y un carácter especial. No olvide la contraseña especificada, la necesitará más adelante. Debería ver una alerta que confirme que el usuario se ha creado.
 
-Puede finalizar el proceso de verificación de cuenta si visita `/verify.html` en el dominio del sitio web e introduce el código de verificación que se le ha enviado por correo electrónico. 
+Puede finalizar el proceso de verificación de cuenta si visita `/verify.html` en el dominio del sitio web e introduce el código de verificación que se le ha enviado por correo electrónico.
 
 Después de confirmar el usuario nuevo con la página `/verify.html` o la consola de Cognito, visite `/signin.html` e inicie sesión con la dirección de correo electrónico y la contraseña que introdujo durante el paso de registro.
 
@@ -280,7 +277,7 @@ resources:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:service}-${self:provider.stage}
-        ProvisionedThroughput: 
+        ProvisionedThroughput:
           ReadCapacityUnits: "5"
           WriteCapacityUnits: "5"
         AttributeDefinitions:
@@ -326,6 +323,8 @@ provider:
 functions:
   RequestUnicorn:
     handler: lambda_function/requestUnicorn.handler
+    environment:
+      dynamoTableName: ${self:service}-${self:provider.stage}
 
 package:
   exclude:
@@ -354,23 +353,23 @@ serverless deploy
 
 ```json
 {
-    "path": "/ride",
-    "httpMethod": "POST",
-    "headers": {
-        "Accept": "*/*",
-        "Authorization": "eyJraWQiOiJLTzRVMWZs",
-        "content-type": "application/json; charset=UTF-8"
-    },
-    "queryStringParameters": null,
-    "pathParameters": null,
-    "requestContext": {
-        "authorizer": {
-            "claims": {
-                "cognito:username": "the_username"
-            }
-        }
-    },
-    "body": "{\"PickupLocation\":{\"Latitude\":47.6174755835663,\"Longitude\":-122.28837066650185}}"
+  "path": "/ride",
+  "httpMethod": "POST",
+  "headers": {
+    "Accept": "*/*",
+    "Authorization": "eyJraWQiOiJLTzRVMWZs",
+    "content-type": "application/json; charset=UTF-8"
+  },
+  "queryStringParameters": null,
+  "pathParameters": null,
+  "requestContext": {
+    "authorizer": {
+      "claims": {
+        "cognito:username": "the_username"
+      }
+    }
+  },
+  "body": "{\"PickupLocation\":{\"Latitude\":47.6174755835663,\"Longitude\":-122.28837066650185}}"
 }
 ```
 
@@ -408,10 +407,12 @@ Usaremos el valor de `UserPoolArn` en el siguiente paso.
 
 **b.** Modifica la definición de la función con lo siguiente:
 
-``` yaml
+```yaml
 functions:
   RequestUnicorn:
     handler: lambda_function/requestUnicorn.handler
+    environment:
+      dynamoTableName: ${self:service}-${self:provider.stage}
     events:
       - http:
           path: ride
@@ -439,14 +440,14 @@ Ocuparemos el valor de `ServiceEndpoint:` en el siguiente paso.
 
 ```js
 window._config = {
-    cognito: {
-        userPoolId: 'VALOR_DE_UserPoolId',
-        userPoolClientId: 'VALOR_DE_UserPoolClientId',
-        region: 'us-east-1'
-    },
-    api: {
-        invokeUrl: 'VALOR_DE_ServiceEndpoint'
-    }
+  cognito: {
+    userPoolId: "VALOR_DE_UserPoolId",
+    userPoolClientId: "VALOR_DE_UserPoolClientId",
+    region: "us-east-1"
+  },
+  api: {
+    invokeUrl: "VALOR_DE_ServiceEndpoint"
+  }
 };
 ```
 
