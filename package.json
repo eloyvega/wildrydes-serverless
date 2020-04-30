@@ -2,7 +2,14 @@
   "name": "wildrydes-serverless",
   "description": "",
   "version": "0.1.0",
-  "dependencies": {},
+  "scripts": {
+    "client-deploy": "serverless client deploy --no-confirm",
+    "deploy": "serverless deploy",
+    "info": "serverless info"
+  },
+  "dependencies": {
+    "serverless": "^1.69.0"
+  },
   "devDependencies": {
     "serverless-finch": "^2.5.2"
   }
