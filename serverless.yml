@@ -3,36 +3,72 @@ service: wildrydes-serverless
 provider:
   name: aws
   runtime: nodejs10.x
+  region: us-east-1
   stage: dev
+  tracing:
+    apiGateway: true
+    lambda: true
+  environment:
+    dynamoTableName: ${self:service}-${self:provider.stage}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
-        - "dynamodb:PutItem"
+        - "dynamodb:*"
       Resource: !GetAtt DynamoTable.Arn
+    - Effect: Allow
+      Action:
+        - codedeploy:*
+      Resource:
+        - "*"
+    - Effect: Allow
+      Action:
+        - codepipeline:PutJobSuccessResult
+        - codepipeline:PutJobFailureResult
+      Resource:
+        - "*"
+
 
 plugins:
   - serverless-finch
+  - serverless-plugin-aws-alerts
+  - serverless-plugin-canary-deployments
+
 custom:
   client:
-    bucketName: ${self:service}-${self:provider.stage}-firstname-lastname
+    bucketName: ${self:service}-${self:provider.stage}-eloy-vega-castillo
     distributionFolder: website
-
+  alerts:
+    dashboards: true
+    alarms:
+      - functionThrottles
+      - functionErrors
+      - functionInvocations
+      - functionDuration
+  
+    
 functions:
   RequestUnicorn:
     handler: lambda_function/requestUnicorn.handler
-    environment:
-      dynamoTableName: ${self:service}-${self:provider.stage}
+    
     events:
       - http:
           path: ride
           method: post
           cors: true
-          # authorizer:
-          #   arn: arn:aws:cognito-idp:us-east-1::userpool/us-east-1_xxxxxxx
+          authorizer:
+            arn: arn:aws:cognito-idp:us-east-1:497402068457:userpool/us-east-1_NIH4DWf86
+    # deploymentSettings:
+    #   type: Linear10PercentEvery1Minute
+    #   alias: Live
+  cleanDynamo:
+    handler: lambda_function/cleanDynamo.handler
+
 
 package:
   exclude:
     - website/**
+
+
 
 resources:
   Resources:
