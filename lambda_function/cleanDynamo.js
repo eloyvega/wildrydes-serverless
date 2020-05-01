@@ -1,6 +1,8 @@
 var assert = require('assert');
 var AWS = require('aws-sdk');
 const ddb = new AWS.DynamoDB.DocumentClient();
+const randomBytes = require("crypto").randomBytes;
+
 
 exports.handler = function(event, context) {
 
@@ -12,6 +14,8 @@ exports.handler = function(event, context) {
     // Retrieve the value of UserParameters from the Lambda action configuration in AWS CodePipeline, in this case a URL which will be
     // health checked by this function.
     var url = event["CodePipeline.job"].data.actionConfiguration.configuration.UserParameters; 
+    
+    const rideId = toUrlString(randomBytes(16));
     
     // Notify AWS CodePipeline of a successful job
     var putJobSuccess = function(message) {
@@ -54,13 +58,23 @@ exports.handler = function(event, context) {
     
 };
 
-function putItem() {
+function putItem(rideId) {
+    
   return ddb
     .put({
       TableName: process.env.dynamoTableName,
       Item: {
+          RideId: rideId,
         value: "dummy"
       }
     })
     .promise();
+}
+
+function toUrlString(buffer) {
+  return buffer
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=/g, "");
 }
